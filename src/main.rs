@@ -1,6 +1,8 @@
 use actix_web::{web, App, HttpServer};
-use shield_trade_sys::matching::MatchingEngine;
 use env_logger::Env;
+use std::sync::{Arc, Mutex};
+use crate::matching::MatchingEngine;
+use crate::api::matching::config as matching_config;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -8,14 +10,14 @@ async fn main() -> std::io::Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
     
     // Initialize matching engine
-    let matching_engine = web::Data::new(MatchingEngine::new());
+    let engine = Arc::new(Mutex::new(MatchingEngine::new()));
 
     log::info!("Starting trading engine server on 127.0.0.1:8080");
     
     HttpServer::new(move || {
         App::new()
-            .app_data(matching_engine.clone())
-            .configure(shield_trade_sys::api::config)
+            .app_data(web::Data::new(engine.clone()))
+            .configure(matching_config)
     })
     .bind("127.0.0.1:8080")?
     .run()

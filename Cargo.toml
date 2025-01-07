@@ -1,18 +1,20 @@
 [package]
-name = "ShieldTradeSys"
+name = "shield_trade_sys"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-actix-web = "4.0.1"
-async-trait = "0.1"
-chrono = "0.4"
-crossbeam-channel = "0.5"
-env_logger = "0.10"
-log = "0.4"
-rust_decimal = "1.33"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-thiserror = "1.0"
-tokio = { version = "1.0", features = ["full"] }
-uuid = { version = "1.0", features = ["v4"] }
+actix-web = "4.9.0"
+async-trait = "0.1.72"
+bigdecimal = "0.4.7"
+chrono = "0.4.31"
+crossbeam-channel = "0.5.14"
+env_logger = "0.11.6"
+log = "0.4.20"
+rust_decimal = "1.36.0"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.108"
+thiserror = "2.0.9"
+tokio = { version = "1.42.0", features = ["full"] }
+uuid = { version = "1.11.0", features = ["v4", "serde"] }
+jsonwebtoken = "8.1"

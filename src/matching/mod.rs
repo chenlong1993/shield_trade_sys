@@ -2,7 +2,7 @@ pub mod order_book;
 pub mod matching_engine;
 
 use async_trait::async_trait;
-use crate::types::{Order, Trade};
+use crate::types::{Numeric, Order, Trade};
 use crate::error::TradingResult;
 
 #[async_trait]
@@ -40,7 +40,7 @@ mod tests {
 
     #[test]
     fn test_basic_matching() {
-        let engine = MatchingEngine::new();
+        let mut engine = MatchingEngine::new();
         let symbol = "BTCUSD".to_string();
         
         let buy_order = Order::new(
