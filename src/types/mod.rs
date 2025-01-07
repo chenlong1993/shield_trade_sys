@@ -7,16 +7,43 @@ use uuid::Uuid;
 pub struct Order {
     pub id: Uuid,
     pub symbol: String,
-    pub price: Numeric,
-    pub quantity: Numeric,
-    pub side: OrderSide,
+    pub price: f64,
+    pub quantity: f64,
+    pub side: String,
     pub timestamp: i64,
+    pub status: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Trade {
+    pub symbol: String,
+    pub taker_side: String,
+    pub taker_order_id: Uuid,
+    pub maker_order_id: Uuid,
+    pub price: f64,
+    pub quantity: f64,
+    pub timestamp: i64,
+}
+
+// 定义 OrderSide 枚举
+#[derive(Debug, Serialize, Deserialize, PartialEq, Clone)]
 pub enum OrderSide {
-    Buy,//购买
-    Sell,//出售
+    #[serde(rename = "bid")]
+    Buy,
+    #[serde(rename = "ask")]
+    Sell,
+}
+// 定义 OrderType 枚举
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
+pub enum OrderType {
+    #[serde(rename = "limit")]
+    Limit,
+    #[serde(rename = "market")]
+    Market,
+    #[serde(rename = "marketQty")]
+    MarketQuantity,
+    #[serde(rename = "marketAmount")]
+    MarketAmount,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -30,7 +30,7 @@ async fn place_order(
 ) -> HttpResponse {
     let mut engine = engine.lock().unwrap();
     match engine.add_order(order.into_inner().into()).await {
-        Ok(_) => HttpResponse::Ok().json("Order placed successfully"),
+        Ok(trades) => HttpResponse::Ok().json(trades),
         Err(e) => HttpResponse::BadRequest().json(e.to_string()),
     }
 }
@@ -40,7 +40,7 @@ async fn cancel_order(
     order_id: web::Path<Uuid>,
 ) -> HttpResponse {
     let mut engine = engine.lock().unwrap();
-    match engine.cancel_order(*order_id).await {
+    match engine.cancel_order("", *order_id).await {
         Ok(_) => HttpResponse::Ok().json("Order cancelled successfully"),
         Err(e) => HttpResponse::BadRequest().json(e.to_string()),
     }
@@ -52,8 +52,8 @@ async fn get_order(
 ) -> HttpResponse {
     let engine = engine.lock().unwrap();
     match engine.get_order(*order_id).await {
-        Some(order) => HttpResponse::Ok().json(order),
-        None => HttpResponse::NotFound().json("Order not found"),
+        Ok(order) => HttpResponse::Ok().json(order),
+        Err(e) => HttpResponse::NotFound().json(e.to_string()),
     }
 }
 
@@ -77,7 +77,7 @@ async fn get_orderbook(
 ) -> HttpResponse {
     let engine = engine.lock().unwrap();
     match engine.get_orderbook(&symbol).await {
-        Some(orderbook) => HttpResponse::Ok().json(orderbook),
-        None => HttpResponse::NotFound().json("Orderbook not found"),
+        Ok(orderbook) => HttpResponse::Ok().json(orderbook),
+        Err(e) => HttpResponse::NotFound().json(e.to_string()),
     }
 }

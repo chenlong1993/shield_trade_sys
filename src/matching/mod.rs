@@ -52,6 +52,7 @@ mod tests {
             None,
         );
 
+
         let sell_order = Order::new(
             &symbol,
             Numeric::from_str("50000").unwrap(),
