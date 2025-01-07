@@ -1,6 +1,7 @@
 # Shield Trade System
 
 基于Actix-web的高性能交易系统
+> 目前整体该在完善中，后续会添加更多功能，还没通过测试，一些还没跑通过测试的代码
 
 ## 模块说明
 
@@ -38,3 +39,6 @@ cargo run
 - POST /matching/order 提交订单
 - DELETE /matching/order/{order_id} 取消订单
 - GET /matching/orderbook/{symbol} 获取订单簿
+
+4.详细文档
+- [API文档](./docs/api.md)
