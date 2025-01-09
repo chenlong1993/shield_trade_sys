@@ -67,3 +67,8 @@ cargo run
 
 4.详细文档
 - [API文档](./docs/api.md)
+
+
+#### Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=rogers3333/shield_trade_sys&type=Date)](https://star-history.com/#rogers3333/shield_trade_sys&Date)
