@@ -1,16 +1,12 @@
 //用于与第三方APP交互
 pub mod matching;
-pub mod middleware;
 
-use actix_web::{web, App, HttpServer};
 use crate::matching::MatchingEngine;
+use actix_web::{web, App, HttpServer};
 use std::sync::{Arc, Mutex};
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/api/v1")
-            .service(matching::config())
-    );
+pub fn config(_cfg: &mut web::ServiceConfig) {
+    todo!()
 }
 
 pub fn create_engine() -> Arc<Mutex<MatchingEngine>> {

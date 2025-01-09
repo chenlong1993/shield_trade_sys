@@ -1,8 +1,8 @@
+use crate::matching::{MatchingEngine, TradingEngine};
 use actix_web::{web, HttpResponse};
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-use crate::matching::MatchingEngine;
 use std::sync::{Arc, Mutex};
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OrderRequest {
@@ -20,41 +20,29 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .route("/order/{order_id}", web::get().to(get_order))
             .route("/orders", web::get().to(get_orders))
             .route("/trades", web::get().to(get_trades))
-            .route("/orderbook/{symbol}", web::get().to(get_orderbook))
+            // .route("/orderbook/{symbol}", web::get().to(get_orderbook))
     );
 }
 
 async fn place_order(
-    engine: web::Data<Arc<Mutex<MatchingEngine>>>,
-    order: web::Json<OrderRequest>,
+    _engine: web::Data<Arc<Mutex<MatchingEngine>>>,
+    _order: web::Json<OrderRequest>,
 ) -> HttpResponse {
-    let mut engine = engine.lock().unwrap();
-    match engine.add_order(order.into_inner().into()).await {
-        Ok(trades) => HttpResponse::Ok().json(trades),
-        Err(e) => HttpResponse::BadRequest().json(e.to_string()),
-    }
+    todo!()
 }
 
 async fn cancel_order(
-    engine: web::Data<Arc<Mutex<MatchingEngine>>>,
-    order_id: web::Path<Uuid>,
+    _engine: web::Data<Arc<Mutex<MatchingEngine>>>,
+    _order_id: web::Path<Uuid>,
 ) -> HttpResponse {
-    let mut engine = engine.lock().unwrap();
-    match engine.cancel_order("", *order_id).await {
-        Ok(_) => HttpResponse::Ok().json("Order cancelled successfully"),
-        Err(e) => HttpResponse::BadRequest().json(e.to_string()),
-    }
+      todo!()
 }
 
 async fn get_order(
-    engine: web::Data<Arc<Mutex<MatchingEngine>>>,
-    order_id: web::Path<Uuid>,
+    _engine: web::Data<Arc<Mutex<MatchingEngine>>>,
+    _order_id: web::Path<Uuid>,
 ) -> HttpResponse {
-    let engine = engine.lock().unwrap();
-    match engine.get_order(*order_id).await {
-        Ok(order) => HttpResponse::Ok().json(order),
-        Err(e) => HttpResponse::NotFound().json(e.to_string()),
-    }
+    todo!()
 }
 
 async fn get_orders(
@@ -65,19 +53,8 @@ async fn get_orders(
 }
 
 async fn get_trades(
-    engine: web::Data<Arc<Mutex<MatchingEngine>>>,
+    _engine: web::Data<Arc<Mutex<MatchingEngine>>>,
 ) -> HttpResponse {
-    let engine = engine.lock().unwrap();
-    HttpResponse::Ok().json(engine.get_trades().await)
+    todo!()
 }
 
-async fn get_orderbook(
-    engine: web::Data<Arc<Mutex<MatchingEngine>>>,
-    symbol: web::Path<String>,
-) -> HttpResponse {
-    let engine = engine.lock().unwrap();
-    match engine.get_orderbook(&symbol).await {
-        Ok(orderbook) => HttpResponse::Ok().json(orderbook),
-        Err(e) => HttpResponse::NotFound().json(e.to_string()),
-    }
-}

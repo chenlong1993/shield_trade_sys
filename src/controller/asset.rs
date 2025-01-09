@@ -54,6 +54,7 @@ impl UserAssetsController {
         Self { repo, logger }
     }
 
+    //存款
     pub async fn deposit(
         data: web::Data<Arc<Self>>,
         req: web::Json<DepositRequest>
@@ -70,6 +71,7 @@ impl UserAssetsController {
         }
     }
 
+    //提取
     pub async fn withdraw(
         data: web::Data<Arc<Self>>,
         req: web::Json<WithdrawRequest>
@@ -86,6 +88,7 @@ impl UserAssetsController {
         }
     }
 
+    //交易
     pub async fn transfer(
         data: web::Data<Arc<Self>>,
         req: web::Json<TransferRequest>
@@ -103,6 +106,7 @@ impl UserAssetsController {
         }
     }
 
+    //查询历史
     pub async fn query_assets(
         data: web::Data<Arc<Self>>,
         user_id: web::Path<String>,

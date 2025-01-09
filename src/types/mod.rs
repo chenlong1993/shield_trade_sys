@@ -114,11 +114,7 @@ impl fmt::Display for Order {
 }
 
 impl fmt::Display for Trade {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "Trade {{ id: {}, symbol: {}, price: {}, quantity: {}, taker_side: {}, timestamp: {} }}",
-            self.id, self.symbol, self.price, self.quantity, self.taker_side, self.timestamp
-        )
+    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        todo!()
     }
 }

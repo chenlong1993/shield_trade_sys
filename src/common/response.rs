@@ -1,21 +1,23 @@
-use actix_web::{web, HttpResponse, Responder};
-use rust_decimal::Decimal;
+use actix_web::{HttpResponse, Responder};
 use rust_decimal::prelude::FromStr;
+use rust_decimal::Decimal;
 use serde::Serialize;
 
 // 响应结构体
 #[derive(Serialize)]
-struct Response<T> {
-    ok: bool,
-    data: Option<T>,
-    msg: Option<String>,
+pub struct Response<T> {
+    pub ok: bool,
+    pub data: Option<T>,
+    pub msg: Option<String>,
+    pub code: Option<i8>,
 }
 
 // 成功响应
-async fn response_ok<T: Serialize>(data: T) -> impl Responder {
+pub async fn response_ok<T: Serialize>(data: T) -> impl Responder {
     let response = Response {
         ok: true,
         data: Some(data),
+        code: None,
         msg: None,
     };
     HttpResponse::Ok().json(response)
@@ -27,6 +29,7 @@ async fn response_error(err: &str) -> impl Responder {
         ok: false,
         data: None,
         msg: Some(err.to_string()),
+        code: None,
     };
     HttpResponse::Ok().json(response)
 }
@@ -37,23 +40,3 @@ fn format_str_number(n: &str, p: u32) -> Result<String, rust_decimal::Error> {
     Ok(d.round_dp(p).to_string())
 }
 
-// 示例路由
-async fn example_route() -> impl Responder {
-    match format_str_number("1234.56789", 2) {
-        Ok(result) => response_ok(result).await,
-        Err(err) => response_error(&err.to_string()).await,
-    }
-}
-
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    use actix_web::{App, HttpServer};
-
-    HttpServer::new(|| {
-        App::new()
-            .route("/", web::get().to(example_route))
-    })
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
-}

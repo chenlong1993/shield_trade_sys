@@ -1,5 +1,5 @@
-use actix_web::{web, App, HttpServer, HttpRequest, HttpResponse, Responder};
-use jsonwebtoken::{decode, DecodingKey, Validation, Algorithm};
+use actix_web::{HttpRequest, HttpResponse, Responder};
+use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use serde::{Deserialize, Serialize};
 
 // 定义 JWT 的 Claims 结构体
