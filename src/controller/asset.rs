@@ -1,7 +1,9 @@
+use std::str::FromStr;
 use actix_web::{web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use std::sync::Arc;
+use serde_json::json;
 use crate::types::Numeric;
 
 pub struct UserAssetsController {
@@ -9,6 +11,7 @@ pub struct UserAssetsController {
     logger: Arc<env_logger::Logger>,
 }
 
+//定义相关的接口
 pub trait AssetRepository: Send + Sync {
     fn deposit(&self, transaction_id: &str, user_id: &str, symbol: &str, amount: Numeric) -> Result<(), String>;
     fn withdraw(&self, transaction_id: &str, user_id: &str, symbol: &str, amount: Numeric) -> Result<(), String>;

@@ -1,27 +1,40 @@
-use actix_web::{HttpResponse, Responder};
-use serde::Serialize;
+use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use std::sync::Mutex;
+use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Serialize)]
-pub struct ApiResponse<T: Serialize> {
-    code: i32,
-    message: String,
-    data: Option<T>,
+// 定义 BaseController 结构体
+pub struct BaseController {
+    trade_variety: Box<dyn TradeVarietyRepository>,
+    state: ()
 }
-
-impl<T: Serialize> ApiResponse<T> {
-    pub fn success(data: T) -> Self {
-        Self {
-            code: 0,
-            message: "success".to_string(),
-            data: Some(data),
-        }
+impl BaseController {
+    // ping 处理函数
+    pub(crate) async fn ping(&self) -> impl Responder {
+        HttpResponse::Ok().json("pong")
     }
 
-    pub fn error(code: i32, message: String) -> Self {
-        Self {
-            code,
-            message,
-            data: None,
+    // time 处理函数
+    pub(crate) async fn time(&self) -> impl Responder {
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_nanos();
+        HttpResponse::Ok().json(serde_json::json!({ "time": now }))
+    }
+
+    // exchange_info 处理函数
+    pub(crate) async fn exchange_info(&self, req: HttpRequest) -> impl Responder {
+        let symbol = req
+            .query_string()
+            .split('=')
+            .nth(1)
+            .unwrap_or("")
+            .to_uppercase();
+
+        let state = self.state.lock().unwrap();
+        match state.trade_variety.find_by_symbol(&symbol) {
+            Some(trade_variety) => HttpResponse::Ok().json(trade_variety),
+            None => HttpResponse::NotFound().json("Trade variety not found"),
         }
     }
 }

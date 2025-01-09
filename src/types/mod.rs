@@ -47,16 +47,6 @@ pub enum OrderType {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Trade {
-    pub id: Uuid,
-    pub symbol: String,
-    pub price: Numeric,
-    pub quantity: Numeric,
-    pub taker_side: OrderSide,
-    pub timestamp: i64,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OrderRequest {
     pub symbol: String,
     pub price: String,
