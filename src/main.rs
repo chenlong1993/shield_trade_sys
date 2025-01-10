@@ -3,9 +3,17 @@ use env_logger::Env;
 use shield_trade_sys::MatchingEngine;
 use std::env;
 use std::sync::{Arc, Mutex};
+use dotenv::dotenv;
+
+mod infra;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    dotenv().ok();
+    let db_config = infra::postgresql::PostgreSQLConfig::from_env();
+    let redis_config = infra::redis::RedisConfig::from_env();
+    let db = infra::postgresql::connect_database(&db_config).await;
+    let redis = infra::redis::connect_redis(&redis_config);
     // Initialize matching engine
     let engine = Arc::new(Mutex::new(MatchingEngine::new()));
 

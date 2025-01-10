@@ -18,4 +18,6 @@ uuid = { version = "1.11.0", features = ["v4", "serde"] }
 jsonwebtoken = "8.1"
 rust_decimal_macros = "1.36"
 futures = "0.3.31"
-
+sea-orm = { version = "1.1.3", features = ["sqlx-postgres","runtime-tokio"] }
+dotenv = "0.15"
+redis = "0.23.0"
