@@ -4,8 +4,9 @@ pub mod types;
 pub mod models;
 pub mod repository;
 pub mod infra;
-mod error;
-mod common;
-mod controller;
+pub mod service;
+pub mod error;
+pub mod common;
+pub mod controller;
 
 pub use matching::MatchingEngine;
