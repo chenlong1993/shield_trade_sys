@@ -1,7 +1,7 @@
 use shield_trade_sys::service::order;
 
 #[test]
- fn test_get_user_id_key_integration() -> () {
+fn test_get_user_id_key_integration() -> () {
     // 测试正常情况，长度大于等于3的用户ID
     let user_id_1 = "12345";
     match order::get_user_id_key(user_id_1) {
@@ -34,6 +34,19 @@ use shield_trade_sys::service::order;
         }
         Err(err) => {
             assert_eq!(err, "user_id不能为空");
+        }
+    }
+}
+#[test]
+fn test_get_order_id() -> () {
+    match order::get_order_id() {
+        Ok(order_id) => {
+            println!("order_id: {}", order_id);
+            assert!(order_id.len() >0)
+        }
+        Err(e) => {
+            println!("Failed to get order_id: {}", e);
+            assert!(false, "Expected Ok, but got Err: {}", e);
         }
     }
 }

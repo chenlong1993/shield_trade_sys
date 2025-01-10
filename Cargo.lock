@@ -1297,6 +1297,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "idgen_rs"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3588beae66d912a1e4889a3b3a3931a9914f63c164afcd3e3fc1c27f5948c40a"
+dependencies = [
+ "chrono",
+ "lazy_static",
+]
+
+[[package]]
 name = "idna"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2245,6 +2255,7 @@ dependencies = [
  "dotenv",
  "env_logger",
  "futures",
+ "idgen_rs",
  "jsonwebtoken",
  "log",
  "redis",
