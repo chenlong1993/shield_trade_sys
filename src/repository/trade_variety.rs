@@ -2,6 +2,7 @@ use crate::common::status::Status;
 use crate::repository::base::Base;
 use crate::repository::variety::Variety;
 
+
 // 对应TradeVariety结构体
 #[derive(Debug)]
 pub struct TradeVariety {
