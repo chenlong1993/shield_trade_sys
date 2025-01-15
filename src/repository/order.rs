@@ -1,10 +1,12 @@
 use chrono::{NaiveDateTime, Utc};
+use rust_decimal::Decimal;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
+use crate::repository::base::UUID;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Order {
-    pub uuid: Uuid,                         // 唯一标识符
+    pub uuid: UUID,                         // 唯一标识符
     pub base: String,                       // 基础字段，根据实际情况调整类型
     pub symbol: String,                     // 交易对符号
     pub order_id: String,                   // 订单ID
@@ -15,8 +17,8 @@ pub struct Order {
     pub quantity: String,                   // 数量
     pub fee_rate: String,                   // 手续费率
     pub amount: String,                     // 金额
-    pub freeze_qty: String,                 // 冻结数量
-    pub freeze_amount: String,              // 冻结金额
+    pub freeze_qty: Decimal,                 // 冻结数量
+    pub freeze_amount: Decimal,              // 冻结金额
     pub avg_price: String,                  // 平均价格
     pub finished_qty: String,               // 完成数量
     pub finished_amount: String,            // 完成金额

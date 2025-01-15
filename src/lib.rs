@@ -8,5 +8,6 @@ pub mod service;
 pub mod error;
 pub mod common;
 pub mod controller;
+pub mod domain;
 
 pub use matching::MatchingEngine;

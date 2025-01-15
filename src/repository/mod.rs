@@ -4,7 +4,7 @@ pub mod base;
 pub mod trade_variety;
 mod variety;
 pub mod trade;
-mod kline;
-mod order;
+pub mod kline;
+pub mod order;
 
 pub use asset::*;
