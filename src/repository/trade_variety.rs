@@ -1,7 +1,11 @@
 use crate::common::status::Status;
 use crate::repository::base::Base;
 use crate::repository::variety::Variety;
-
+use chrono::DateTime;
+use rust_decimal::Decimal;
+use sqlx::types::BigDecimal;
+use std::os::unix::raw::time_t;
+use std::time::SystemTime;
 
 // 对应TradeVariety结构体
 #[derive(Debug)]
@@ -11,18 +15,18 @@ pub struct TradeVariety {
     name: String,
     target_id: i32,
     base_id: i32,
-    target_variety: Option<Variety>,
-    base_variety: Option<Variety>,
     price_decimals: i32,
     qty_decimals: i32,
-    allow_min_qty: String,
-    allow_max_qty: String,
-    allow_min_amount: String,
-    allow_max_amount: String,
-    fee_rate: String,
+    allow_min_qty: BigDecimal,
+    allow_max_qty: BigDecimal,
+    allow_min_amount: BigDecimal,
+    allow_max_amount: BigDecimal,
+    pub(crate) fee_rate: BigDecimal,
     status: Status,
     sort: i64,
     base: Base,
+    created_at: SystemTime,
+    update_at: SystemTime,
 }
 
 // 对应CreateTradeVariety结构体
@@ -32,13 +36,13 @@ pub struct CreateTradeVariety {
     name: String,
     target_id: i32,
     base_id: i32,
-    price_decimals: i32,
-    qty_decimals: i32,
-    allow_min_qty: String,
-    allow_max_qty: String,
-    allow_min_amount: String,
-    allow_max_amount: String,
-    fee_rate: String,
+    price_decimals: Decimal,
+    qty_decimals: Decimal,
+    allow_min_qty: Decimal,
+    allow_max_qty: Decimal,
+    allow_min_amount: Decimal,
+    allow_max_amount: Decimal,
+    fee_rate: Decimal,
     status: Status,
     sort: i64,
 }
@@ -51,14 +55,13 @@ pub struct UpdateTradeVariety {
     name: Option<String>,
     target_id: Option<i32>,
     base_id: Option<i32>,
-    price_decimals: Option<i32>,
-    qty_decimals: Option<i32>,
-    allow_min_qty: Option<String>,
-    allow_max_qty: Option<String>,
-    allow_min_amount: Option<String>,
-    allow_max_amount: Option<String>,
-    fee_rate: Option<String>,
+    price_decimals: Decimal,
+    qty_decimals: Decimal,
+    allow_min_qty: Decimal,
+    allow_max_qty: Decimal,
+    allow_min_amount: Decimal,
+    allow_max_amount: Decimal,
+    fee_rate: Decimal,
     status: Option<Status>,
     sort: Option<i64>,
 }
-

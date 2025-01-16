@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use rust_decimal::Decimal;
+use sqlx::types::BigDecimal;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EventOrderNew {
@@ -16,19 +17,19 @@ pub struct EventOrderNew {
     pub order_type: Option<String>,  // Adjust this type based on your OrderType enum
 
     #[serde(rename = "price", skip_serializing_if = "Option::is_none")]
-    pub price: Option<Decimal>,
+    pub price: Option<BigDecimal>,
 
     #[serde(rename = "quantity", skip_serializing_if = "Option::is_none")]
-    pub quantity: Option<Decimal>,
+    pub quantity: Option<BigDecimal>,
 
     #[serde(rename = "amount", skip_serializing_if = "Option::is_none")]
-    pub amount: Option<Decimal>,
+    pub amount: Option<BigDecimal>,
 
     #[serde(rename = "max_amount", skip_serializing_if = "Option::is_none")]
-    pub max_amount: Option<Decimal>,
+    pub max_amount: Option<BigDecimal>,
 
     #[serde(rename = "max_qty", skip_serializing_if = "Option::is_none")]
-    pub max_qty: Option<Decimal>,
+    pub max_qty: Option<BigDecimal>,
 
     #[serde(rename = "nano_time", skip_serializing_if = "Option::is_none")]
     pub nano_time: Option<i64>,
