@@ -5,9 +5,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Base {
     #[serde(rename = "created_at")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: i64,
     #[serde(rename = "updated_at")]
-    pub updated_at: DateTime<Utc>,
+    pub updated_at: i64,
 }
 //对应公共UUID
 #[derive(Serialize, Deserialize, Clone, Debug)]

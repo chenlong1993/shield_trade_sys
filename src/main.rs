@@ -25,6 +25,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(engine.clone()))
+            .app_data(web::Data::new(_db.clone()))
             // .configure(matching_config)
     })
     .bind("127.0.0.1:8080")?

@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder};
 use rust_decimal::prelude::FromStr;
 use rust_decimal::Decimal;
 use serde::Serialize;
@@ -6,32 +6,19 @@ use serde::Serialize;
 // 响应结构体
 #[derive(Serialize)]
 pub struct Response<T> {
-    pub ok: bool,
-    pub data: Option<T>,
-    pub msg: Option<String>,
-    pub code: Option<i8>,
+    pub(crate) data: Option<T>,
+    pub(crate) code: i32,
+    pub(crate) msg:String
 }
 
 // 成功响应
-pub async fn response_ok<T: Serialize>(data: T) -> impl Responder {
-    let response = Response {
-        ok: true,
-        data: Some(data),
-        code: None,
-        msg: None,
-    };
-    HttpResponse::Ok().json(response)
-}
-
-// 错误响应
-async fn response_error(err: &str) -> impl Responder {
-    let response = Response::<()> {
-        ok: false,
-        data: None,
-        msg: Some(err.to_string()),
-        code: None,
-    };
-    HttpResponse::Ok().json(response)
+impl <T> Response<T>{
+    pub fn success(data: Option<T>) -> web::Json<Response<T>> {
+        web::Json(Response {data,code: 200,msg: String::from("操作成功"),})
+    }
+    pub fn failed(msg: String) -> web::Json<Response<String>> {
+        web::Json(Response { data:None, code: 200, msg})
+    }
 }
 
 // 格式化字符串数字

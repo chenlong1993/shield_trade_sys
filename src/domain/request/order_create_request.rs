@@ -2,6 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OrderCreateRequest {
+    #[serde(rename = "user_id")]
+    pub user_id: String,  // 交易对符号，例如 "btcusdt"
     #[serde(rename = "symbol")]
     pub symbol: String,  // 交易对符号，例如 "btcusdt"
 

@@ -1,6 +1,7 @@
 use dotenv::dotenv;
 use std::env;
-use sqlx::{Connection, PgConnection, Postgres, Error};
+use sea_orm::{Database, DatabaseConnection};
+
 pub struct PostgreSQLConfig {
     pub database_url: String,
 }
@@ -14,6 +15,8 @@ impl PostgreSQLConfig {
     }
 }
 
-pub async fn connect_database(config: &PostgreSQLConfig) -> Result<PgConnection, Error> {
-    PgConnection::connect(&config.database_url).await.map_err(Error::from)
+pub async fn connect_database(config: &PostgreSQLConfig) -> DatabaseConnection {
+    Database::connect(&config.database_url)
+        .await
+        .expect("Failed to connect to the database")
 }
