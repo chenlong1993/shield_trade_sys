@@ -11,26 +11,26 @@ use idgen_rs::id_helper;
 use idgen_rs::options::IGOptions;
 use log::error;
 use rust_decimal::Decimal;
-use sea_orm::sea_query::ExprTrait;
+use sea_orm::sea_query::{ExprTrait, SimpleExpr};
 use sea_orm::ActiveValue::Set;
-use sea_orm::{
-    ActiveModelTrait, Condition, DatabaseConnection, EntityTrait, QueryFilter, TransactionTrait,ColumnTrait
-};
+use sea_orm::{ActiveModelTrait, Condition, DatabaseConnection, EntityTrait, QueryFilter, TransactionTrait, ColumnTrait, DbErr};
 use serde_json::json;
 use std::str::FromStr;
+use futures::future::ok;
 use rust_decimal::prelude::Zero;
+use sea_orm::prelude::Expr;
 use uuid::Uuid;
 
+
 pub async fn create_order(
-    db: web::Data<DatabaseConnection>,
-    req: web::Json<OrderCreateRequest>,
-) -> impl Responder {
-    let req = req.into_inner();
+    db: &DatabaseConnection,
+    req: OrderCreateRequest,
+) -> Result<order::Model, sea_orm::DbErr> {
     let user_id = req.user_id.clone();
     //如果是限价单
     if req.order_type == "limit" {
         if req.price.is_none() || req.quantity.is_none() {
-            return Response::failed("price and quantity are required".to_string()).into();
+            return Err(DbErr::Custom("price or quantity isnull".parse().unwrap()));
         }
 
         // 创建限价订单逻辑
@@ -46,7 +46,7 @@ pub async fn create_order(
             f64::try_from(price.clone()).unwrap(),
             f64::try_from(quantity.clone()).unwrap(),
         )
-        .await
+            .await
         {
             Ok(order) => {
                 let event = EventOrderNew {
@@ -64,22 +64,21 @@ pub async fn create_order(
 
                 publish_event(event).await;
 
-                Response::success(Some(order.order_id))
+                Ok(order)
             }
             Err(err) => {
                 //打印错误日志
-                // 打印错误日志
                 error!("create limit order error: {:?}", err);
-                Response::failed("create limit order error".to_string()).into()
+                Err(DbErr::Custom("create limit order error".parse().unwrap())).expect("TODO: panic message")
             }
         }
     } else {
         if req.amount.is_none() && req.quantity.is_none() {
-            return HttpResponse::BadRequest().json("amount or quantity is required");
+            return  Err(DbErr::Custom("amount or quantity is required".parse().unwrap()))
         }
 
         // 创建市价订单逻辑
-        if let Some(amount) = req.amount {
+        if let Some(amount) = &req.amount {
             let amount = Decimal::from_str(&amount).unwrap();
 
             match create_market_order_by_amount(&*user_id, &req.symbol, &req.side, amount.clone())
@@ -89,7 +88,7 @@ pub async fn create_order(
                     let event = EventOrderNew {
                         symbol: Some(order.symbol.clone()),
                         order_id: Some(order.order_id.clone()),
-                        order_side: Some(order.order_side.clone()),
+                        order_side: Some(order.order_id.clone()),
                         order_type: Some(order.order_type.clone()),
                         nano_time: Some(order.nano_time),
                         price: None,
@@ -101,15 +100,15 @@ pub async fn create_order(
 
                     publish_event(event).await;
 
-                    HttpResponse::Ok().json(order.order_id)
+                    Ok(order)
                 }
                 Err(err) => {
                     error!("create market order by amount error: {:?}", err);
-                    HttpResponse::InternalServerError().json("create market order by amount error")
+                    Err(DbErr::Custom("create market order by amount error".parse().unwrap()))
                 }
             }
         } else {
-            let quantity = Decimal::from_str(&req.quantity.unwrap()).unwrap();
+            let quantity = Decimal::from_str(&*req.quantity.unwrap()).unwrap();
 
             match create_market_order_by_qty(&*user_id, &req.symbol, &req.side, quantity.clone())
                 .await
@@ -130,11 +129,11 @@ pub async fn create_order(
 
                     publish_event(event).await;
 
-                    HttpResponse::Ok().json(order.order_id)
+                    Ok(order)
                 }
                 Err(err) => {
                     error!("create market order by qty error: {:?}", err);
-                    HttpResponse::InternalServerError().json("create market order by qty error")
+                    Err(DbErr::Custom("create market order by qty error".parse().unwrap()))
                 }
             }
         }
@@ -160,6 +159,8 @@ async fn create_limit_order(
             id: String::from(Uuid::new_v4()),
         };
 
+        //
+        let fee_rate =trade_info?.get(0).unwrap().fee_rate;
         let mut data = order::Model {
             uuid: uid.id,
             order_id: order_id.clone(),
@@ -170,7 +171,7 @@ async fn create_limit_order(
             price: price.clone(),
             quantity: quantity.clone(),
             nano_time: Utc::now().timestamp(),
-            fee_rate: trade_info?.fee_rate.to_string().parse().unwrap(),
+            fee_rate: fee_rate.unwrap(),
             amount: Default::default(),
             freeze_qty: Default::default(),
             freeze_amount: Default::default(),
@@ -240,7 +241,7 @@ async fn create_limit_order(
             nano_time: Set(data.nano_time),
         };
 
-        new_order.insert(&db).await?;
+        new_order.insert(db).await?;
 
         // sqlx::query("INSERT INTO unfinished_orders (...) VALUES (...)")
         //     .bind(&unfinished.order_id)
@@ -249,7 +250,7 @@ async fn create_limit_order(
         //     .await?;
 
         tx.unwrap().commit().await?;
-        Response::success(Some("order created")).into()
+        Ok(data)
     }
 }
 
@@ -260,21 +261,22 @@ pub async fn freeze_amount(
     amount: f64,
     db: &DatabaseConnection,
 ) -> Result<(), Error> {
-    let now = std::time::SystemTime::now();
+    //打印当前时间
+
     let update_result = asset_freezes::Entity::update_many()
         .col_expr(
             asset_freezes::Column::FreezeAmount,
-            asset_freezes::Column::FreezeAmount.add(amount),
+            Expr::col(asset_freezes::Column::FreezeAmount).add(amount),
         )
-        .col_expr(asset_freezes::Column::UpdatedAt, now.into())
+        .col_expr(asset_freezes::Column::UpdatedAt, SimpleExpr::from(Utc::now().timestamp_millis()))
         .filter(
             asset_freezes::Column::TransId
                 .eq(trans_id)
                 .and(asset_freezes::Column::UserId.eq(user_id))
                 .and(asset_freezes::Column::Symbol.eq(symbol)),
         )
-        .exec(&db)
-        .await?;
+        .exec(db)
+        .await.expect("");
 
     println!("Updated {} records", update_result.rows_affected);
     Ok(())
@@ -283,7 +285,7 @@ pub async fn freeze_amount(
 pub async fn find_by_symbol(
     db: &DatabaseConnection,
     symbol: &str,
-) -> Result<trade_varieties::Model, sea_orm::DbErr> {
+) -> Result<Vec<trade_varieties::Model>, sea_orm::DbErr> {
     let condition = Condition::all().add(trade_varieties::Column::Symbol.eq(symbol));
 
     // 查询数据库获取 TradeVariety
@@ -322,9 +324,9 @@ pub async fn validate_order_limit(
         .add(order::Column::OrderSide.eq(opposite_side));
 
     // 查询数据库获取 TradeVariety
-    let existing_order = order::Entity::find().filter(condition).all(db).await?;
+    let existing_order = order::Entity::find().filter(condition).all(db).await;
 
-    if let Some(_) = existing_order {
+    if !existing_order.unwrap().is_empty() {
         return Err("Opposite order exists for the same user".to_string());
     }
 

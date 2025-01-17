@@ -4,9 +4,6 @@ use crate::repository::variety::Variety;
 use chrono::DateTime;
 use rust_decimal::Decimal;
 use sqlx::types::BigDecimal;
-use std::os::unix::raw::time_t;
-use std::time::SystemTime;
-
 // 对应TradeVariety结构体
 #[derive(Debug)]
 pub struct TradeVariety {
@@ -25,8 +22,8 @@ pub struct TradeVariety {
     status: Status,
     sort: i64,
     base: Base,
-    created_at: SystemTime,
-    update_at: SystemTime,
+    created_at: i64,
+    update_at: i64,
 }
 
 // 对应CreateTradeVariety结构体
