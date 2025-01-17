@@ -4,11 +4,11 @@ create table public.assets
         primary key,
     user_id        varchar(30) not null,
     symbol         varchar(30) not null,
-    total_balance  numeric(40, 20) default 0,
-    freeze_balance numeric(40, 20) default 0,
-    avail_balance  numeric(40, 20) default 0,
-    created_at     timestamp with time zone,
-    updated_at     timestamp with time zone
+    total_balance  double precision default 0,
+    freeze_balance double precision default 0,
+    avail_balance  double precision default 0,
+    created_at     bigint,
+    updated_at     bigint
 );
 
 alter table public.assets
@@ -22,18 +22,18 @@ create unique index userid_symbol
 
 create table public.assets_logs
 (
-    id             varchar(36)                            not null
+    id             varchar(36) not null
         primary key,
-    user_id        varchar(36)                            not null,
-    symbol         varchar(36)                            not null,
-    before_balance numeric(40, 20)          default 0,
-    amount         numeric(40, 20)          default 0,
-    after_balance  numeric(40, 20)          default 0,
-    trans_id       varchar(36)                            not null,
-    change_type    varchar(36)                            not null,
+    user_id        varchar(36) not null,
+    symbol         varchar(36) not null,
+    before_balance double precision default 0,
+    amount         double precision default 0,
+    after_balance  double precision default 0,
+    trans_id       varchar(36) not null,
+    change_type    varchar(36) not null,
     info           varchar(255),
-    created_at     timestamp with time zone default now() not null,
-    updated_at     timestamp with time zone default now() not null
+    created_at     bigint,
+    updated_at     bigint
 );
 
 alter table public.assets_logs
@@ -41,18 +41,18 @@ alter table public.assets_logs
 
 create table public.assets_freezes
 (
-    id            varchar(36)                            not null
+    id            varchar(36)                not null
         primary key,
-    user_id       varchar(36)                            not null,
-    symbol        varchar(36)                            not null,
-    amount        numeric(40, 20)          default 0,
-    freeze_amount numeric(40, 20)          default 0,
-    status        smallint                 default 0     not null,
-    trans_id      varchar(36)                            not null,
-    freeze_type   varchar(36)                            not null,
+    user_id       varchar(36)                not null,
+    symbol        varchar(36)                not null,
+    amount        double precision default 0,
+    freeze_amount double precision default 0,
+    status        smallint         default 0 not null,
+    trans_id      varchar(36)                not null,
+    freeze_type   varchar(36)                not null,
     info          varchar(255),
-    created_at    timestamp with time zone default now() not null,
-    updated_at    timestamp with time zone default now() not null
+    created_at    bigint,
+    updated_at    bigint
 );
 
 alter table public.assets_freezes
@@ -62,13 +62,13 @@ create table public.asset_logs
 (
     id             text         not null
         primary key,
-    created_at     timestamp with time zone,
-    updated_at     timestamp with time zone,
+    created_at     bigint,
+    updated_at     bigint,
     user_id        varchar(30)  not null,
     symbol         varchar(30)  not null,
-    before_balance numeric(40, 20) default '0'::numeric,
-    amount         numeric(40, 20) default '0'::numeric,
-    after_balance  numeric(40, 20) default '0'::numeric,
+    before_balance double precision default '0'::numeric,
+    amount         double precision default '0'::numeric,
+    after_balance  double precision default '0'::numeric,
     trans_id       varchar(100) not null,
     change_type    varchar(15),
     info           varchar(200)
@@ -88,16 +88,16 @@ create index idx_asset_logs_symbol
 
 create table public.asset_freezes
 (
-    id            text                                 not null
+    id            text                                  not null
         primary key,
-    created_at    timestamp with time zone,
-    updated_at    timestamp with time zone,
-    user_id       varchar(30)                          not null,
-    symbol        varchar(30)                          not null,
-    amount        numeric(40, 20) default '0'::numeric not null,
-    freeze_amount numeric(40, 20) default '0'::numeric not null,
+    created_at    bigint,
+    updated_at    bigint,
+    user_id       varchar(30)                           not null,
+    symbol        varchar(30)                           not null,
+    amount        double precision default '0'::numeric not null,
+    freeze_amount double precision default '0'::numeric not null,
     status        smallint,
-    trans_id      varchar(100)                         not null,
+    trans_id      varchar(100)                          not null,
     freeze_type   varchar(15),
     info          varchar(200)
 );
@@ -125,8 +125,8 @@ create table public.varieties
     is_base       boolean,
     sort          bigint,
     status        bigint,
-    created_at    timestamp with time zone,
-    updated_at    timestamp with time zone
+    created_at    bigint,
+    updated_at    bigint
 );
 
 alter table public.varieties
@@ -141,19 +141,19 @@ create table public.trade_varieties
         primary key,
     symbol           varchar(100) not null,
     name             varchar(250) not null,
-    target_id        integer         default 0,
-    base_id          integer         default 0,
-    price_decimals   bigint          default 2,
-    qty_decimals     bigint          default 0,
-    allow_min_qty    numeric(40, 20) default 0.01,
-    allow_max_qty    numeric(40, 20) default '999999'::numeric,
-    allow_min_amount numeric(40, 20) default 0.01,
-    allow_max_amount numeric(40, 20) default '999999'::numeric,
-    fee_rate         numeric(40, 20) default '0'::numeric,
-    status           bigint          default 0,
-    sort             bigint          default 0,
-    created_at       timestamp with time zone,
-    updated_at       timestamp with time zone
+    target_id        integer default 0,
+    base_id          integer default 0,
+    price_decimals   bigint  default 2,
+    qty_decimals     bigint  default 0,
+    allow_min_qty    double precision,
+    allow_max_qty    double precision,
+    allow_min_amount double precision,
+    allow_max_amount double precision,
+    fee_rate         double precision,
+    status           bigint  default 0,
+    sort             bigint  default 0,
+    created_at       bigint,
+    updated_at       bigint
 );
 
 alter table public.trade_varieties
@@ -195,5 +195,78 @@ comment on column public.order_auto_no.gmt_create is '创建时间';
 comment on column public.order_auto_no.gmt_modified is '更新时间';
 
 alter table public.order_auto_no
+    owner to admin;
+
+create table public."order"
+(
+    uuid            varchar(255)               not null
+        primary key,
+    base            varchar                    not null,
+    symbol          varchar(30)                not null,
+    order_id        varchar(30)                not null
+        unique,
+    order_side      varchar(10)                not null,
+    order_type      varchar(10)                not null,
+    user_id         varchar(64)                not null,
+    price           double precision default 0 not null,
+    quantity        double precision default 0 not null,
+    fee_rate        double precision default 0 not null,
+    amount          double precision default 0 not null,
+    freeze_qty      double precision default 0 not null,
+    freeze_amount   double precision default 0 not null,
+    avg_price       double precision default 0 not null,
+    finished_qty    double precision default 0 not null,
+    finished_amount double precision default 0 not null,
+    fee             double precision default 0 not null,
+    status          smallint         default 0 not null,
+    nano_time       bigint           default 0 not null
+);
+
+alter table public."order"
+    owner to admin;
+
+create table public.trade_log
+(
+    uuid         varchar          not null
+        primary key,
+    base         varchar          not null,
+    symbol       varchar          not null,
+    trade_id     varchar          not null,
+    ask          varchar          not null,
+    bid          varchar          not null,
+    trade_by     smallint         not null,
+    ask_uid      varchar          not null,
+    bid_uid      varchar          not null,
+    price        double precision not null,
+    quantity     double precision not null,
+    amount       double precision not null,
+    ask_fee_rate double precision not null,
+    ask_fee      double precision not null,
+    bid_fee_rate double precision not null,
+    bid_fee      double precision not null
+);
+
+alter table public.trade_log
+    owner to admin;
+
+create table public.kline
+(
+    uuid     varchar(255)               not null
+        primary key,
+    base     varchar                    not null,
+    symbol   varchar                    not null,
+    period   varchar                    not null,
+    open_at  bigint,
+    close_at bigint,
+    open     double precision default 0 not null,
+    high     double precision default 0 not null,
+    low      double precision default 0 not null,
+    close    double precision default 0 not null,
+    volume   double precision default 0 not null,
+    amount   double precision default 0 not null,
+    unique (open_at, close_at)
+);
+
+alter table public.kline
     owner to admin;
 
