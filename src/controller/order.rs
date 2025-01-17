@@ -5,8 +5,6 @@ use actix_web::{post, web, HttpResponse, Responder};
 use rust_decimal::Decimal;
 use sea_orm::DatabaseConnection;
 use serde::{Deserialize, Serialize};
-use std::clone::Clone;
-use std::str::FromStr;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateOrderRequest {
