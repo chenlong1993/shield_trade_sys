@@ -4,6 +4,7 @@ use shield_trade_sys::MatchingEngine;
 use std::env;
 use std::sync::{Arc, Mutex};
 use dotenv::dotenv;
+use tracing_actix_web::TracingLogger;
 
 mod infra;
 
@@ -24,6 +25,7 @@ async fn main() -> std::io::Result<()> {
     
     HttpServer::new(move || {
         App::new()
+            .wrap(TracingLogger::default())
             .app_data(web::Data::new(engine.clone()))
             .app_data(web::Data::new(_db.clone()))
             // .configure(matching_config)
